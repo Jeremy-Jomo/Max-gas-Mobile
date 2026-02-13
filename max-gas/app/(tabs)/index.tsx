@@ -14,11 +14,17 @@ import * as Yup from "yup";
 
 // Validation Schema
 const LoginSchema = Yup.object().shape({
-  phone: Yup.string()
-    .required("Phone number is required")
-    .matches(
-      /^\+?\d{9,15}$/,
-      "Phone must be 9–15 digits, optionally starting with +",
+  identifier: Yup.string()
+    .required("Username or phone number is required")
+    .test(
+      "username-or-phone",
+      "Enter a valid username (min 3 chars) or phone number (9–15 digits)",
+      (value) => {
+        if (!value) return false;
+        const isPhone = /^\+?\d{9,15}$/.test(value);
+        const isUsername = /^[a-zA-Z0-9._]{3,}$/.test(value);
+        return isPhone || isUsername;
+      },
     ),
   password: Yup.string()
     .min(6, "Password must be at least 6 characters")
@@ -32,7 +38,7 @@ export default function Login() {
   const handleLogin = async (values, { resetForm }) => {
     // ✅ JUST CONSOLE.LOG - NO API CALLS
     console.log("📱 Login Form Submitted:");
-    console.log("Phone:", values.phone);
+    console.log("Identifier (username or phone):", values.identifier);
     console.log("Password:", values.password);
     console.log("Timestamp:", new Date().toISOString());
 
@@ -53,7 +59,7 @@ export default function Login() {
       <Text style={styles.title}>Agent Login</Text>
 
       <Formik
-        initialValues={{ phone: "", password: "" }}
+        initialValues={{ identifier: "", password: "" }}
         validationSchema={LoginSchema}
         onSubmit={handleLogin}
       >
@@ -67,22 +73,22 @@ export default function Login() {
           isValid,
         }) => (
           <>
-            {/* Phone Input */}
+            {/* Username or Phone Input */}
             <View style={styles.inputContainer}>
               <TextInput
-                placeholder="Phone Number"
-                onChangeText={handleChange("phone")}
-                onBlur={handleBlur("phone")}
-                value={values.phone}
-                keyboardType="phone-pad"
+                placeholder="Username or Phone Number"
+                onChangeText={handleChange("identifier")}
+                onBlur={handleBlur("identifier")}
+                value={values.identifier}
+                keyboardType="default"
                 autoCapitalize="none"
                 style={[
                   styles.input,
-                  errors.phone && touched.phone && styles.inputError,
+                  errors.identifier && touched.identifier && styles.inputError,
                 ]}
               />
-              {errors.phone && touched.phone && (
-                <Text style={styles.errorText}>{errors.phone}</Text>
+              {errors.identifier && touched.identifier && (
+                <Text style={styles.errorText}>{errors.identifier}</Text>
               )}
             </View>
 
@@ -115,7 +121,7 @@ export default function Login() {
               disabled={!isValid || loading}
             >
               {loading ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color="#e9c10d" />
               ) : (
                 <Text style={styles.buttonText}>LOGIN</Text>
               )}
@@ -138,16 +144,17 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: "bold",
     marginBottom: 30,
+    color: "orange",
   },
   inputContainer: {
     marginBottom: 16,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#15247c",
     borderRadius: 8,
     padding: 14,
-    backgroundColor: "#fff",
+    backgroundColor: "#ffffff",
   },
   inputError: {
     borderColor: "#ff4444",
@@ -159,7 +166,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   button: {
-    backgroundColor: "#000",
+    backgroundColor: "#0d3ad1",
     padding: 16,
     borderRadius: 8,
     alignItems: "center",
