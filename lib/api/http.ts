@@ -56,8 +56,10 @@ export async function apiRequest<T>(args: {
   const payload = text ? (safeJson(text) as ApiErrorPayload | unknown) : null;
 
   if (!res.ok) {
+    const p = payload && typeof payload === 'object' ? (payload as Record<string, unknown>) : null;
     const message =
-      (payload && typeof payload === 'object' && payload && 'detail' in payload && (payload as ApiErrorPayload).detail) ||
+      (p && typeof p.detail === 'string' && p.detail) ||
+      (p && Array.isArray(p.non_field_errors) && p.non_field_errors[0]) ||
       `${res.status} ${res.statusText}`;
     throw new ApiError(String(message), res.status, (payload as ApiErrorPayload) ?? null);
   }
