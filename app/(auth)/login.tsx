@@ -157,6 +157,11 @@ export default function LoginScreen() {
                   style={styles.quickBtn}>
                   <ThemedText style={styles.quickText}>Localhost</ThemedText>
                 </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => saveServerUrl('http://178.128.25.228')}
+                  style={styles.quickBtn}>
+                  <ThemedText style={styles.quickText}>Production</ThemedText>
+                </TouchableOpacity>
               </View>
 
               <TouchableOpacity onPress={() => saveServerUrl(serverUrl)} style={styles.serverSaveBtn}>
